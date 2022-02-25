@@ -41,7 +41,7 @@ def process_log_file(cur, filepath):
     """Processes a log file.
     
     Time information is inserted into the 'time' table. User information
-    is upserted into the 'users' table. And Songplay information is
+    is upserted into the 'users' table. Songplay information is
     inserted into the 'songplays' table.
     
     Args:
@@ -51,9 +51,13 @@ def process_log_file(cur, filepath):
     # open log file
     df = pd.read_json(filepath, lines=True)
 
+    # Check for empty userids - these are treated as empty strings and so must be removed or
+    # the user table and songplays inserts will fail.  Remove the rows once found.
+    df = df[(df['userId'].isin(['']))]
+
     # filter by NextSong action
     df =  df[df.page == 'NextSong']
-
+    
     # convert timestamp column to datetime
     df['ts'] = pd.to_datetime(df['ts'], unit='ms')
     t = df.copy()
@@ -112,7 +116,7 @@ def process_log_file(cur, filepath):
 
 
 def process_data(cur, conn, filepath, func):
-     """Processes JSON files for a data directory path.
+    """Processes JSON files for a data directory path.
     
     Valid function values can be 'process_song_file' or
     'process_log_file'.
