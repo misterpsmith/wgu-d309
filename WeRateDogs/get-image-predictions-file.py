@@ -19,5 +19,6 @@ url_data = requests.get(url)
 if not os.path.isfile(file_name):
     with open(file_name, 'wb') as file:
         file.write(url_data.content)
+    print("%s file downloaded." % file_name)
 else:
     print("%s file exists." % file_name)
